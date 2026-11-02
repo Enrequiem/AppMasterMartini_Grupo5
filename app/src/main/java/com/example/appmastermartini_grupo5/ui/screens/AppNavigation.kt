@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,6 +13,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+
+// Imports locales forzados al grupo 5 para evitar errores de referencia
+import com.example.appmastermartini_grupo5.ui.screens.HomeScreen2
+import com.example.appmastermartini_grupo5.ui.screens.FormularioScreen
+import com.example.appmastermartini_grupo5.ui.screens.PantallaPrincipal
 
 @Composable
 fun AppNavigation() {
@@ -34,6 +40,12 @@ fun AppNavigation() {
                     icon = { Icon(Icons.Default.Edit, contentDescription = "Registro") },
                     label = { Text("Registro") }
                 )
+                NavigationBarItem(
+                    selected = currentRoute == "estado",
+                    onClick = { navController.navigate("estado") },
+                    icon = { Icon(Icons.Default.Star, contentDescription = "Modo Pro") },
+                    label = { Text("Modo Pro") }
+                )
             }
         }
     ) { innerPadding ->
@@ -47,6 +59,9 @@ fun AppNavigation() {
             }
             composable("formulario") {
                 FormularioScreen()
+            }
+            composable("estado") {
+                PantallaPrincipal()
             }
         }
     }
