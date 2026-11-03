@@ -14,7 +14,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
-// Imports locales forzados al grupo 5 para evitar errores de referencia
 import com.example.appmastermartini_grupo5.ui.screens.HomeScreen2
 import com.example.appmastermartini_grupo5.ui.screens.FormularioScreen
 import com.example.appmastermartini_grupo5.ui.screens.PantallaPrincipal
