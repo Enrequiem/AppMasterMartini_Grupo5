@@ -1,210 +1,268 @@
 package com.example.appmastermartini_grupo5.ui.screens
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.appmastermartini_grupo5.R
 import com.example.appmastermartini_grupo5.model.Receta
 import com.example.appmastermartini_grupo5.repository.CatalogoRepository
-import com.example.appmastermartini_grupo5.ui.utils.obtenerWindowSizeClass
 
 @Composable
-fun HomeScreen2(onIrARegistro: () -> Unit = {}) {
-    val windowSizeClass = obtenerWindowSizeClass()
-    val recetas = remember { CatalogoRepository().obtenerRecetas() }
+fun HomeScreen(
+    esModoPro: Boolean,
+    nombreNegocioPro: String,
+    onIrARegistro: () -> Unit,
+    onSeleccionarCurso: (String) -> Unit
+) {
+    val repository = remember { CatalogoRepository() }
+    val listaCursos = remember { repository.obtenerCursos() }
 
-    when (windowSizeClass.widthSizeClass) {
-        WindowWidthSizeClass.Compact -> HomeScreenCompacta(recetas, onIrARegistro)
-        WindowWidthSizeClass.Medium -> HomeScreenMediana(recetas, onIrARegistro)
-        WindowWidthSizeClass.Expanded -> HomeScreenExpandida(recetas, onIrARegistro)
-        else -> HomeScreenCompacta(recetas, onIrARegistro)
-    }
-}
+    val colorFondo by animateColorAsState(
+        targetValue = if (esModoPro) Color(0xFF0E1014) else Color(0xFFFDFBFF),
+        label = "ColorFondoHome"
+    )
+    val colorBotonPrincipal by animateColorAsState(
+        targetValue = if (esModoPro) Color(0xFFD4AF37) else Color(0xFF3B5984),
+        label = "ColorBotonPrincipal"
+    )
+    val colorTextoTitulo = if (esModoPro) Color.White else Color(0xFF1C1B1F)
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HomeScreenCompacta(recetas: List<Receta>, onIrARegistro: () -> Unit = {}) {
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text(text = "Master Martini Chile") })
-        }
-    ) { innerPadding ->
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = colorFondo
+    ) {
         LazyColumn(
             modifier = Modifier
-                .padding(paddingValues = innerPadding)
                 .fillMaxSize()
-                .padding(all = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(space = 16.dp)
+                .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                Text(
-                    text = "¡Bienvenido al Portal Técnico!",
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.titleLarge
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "Logo Master Martini",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(height = 140.dp),
-                    contentScale = ContentScale.Fit
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "Master Martini Chile",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = colorTextoTitulo
+                        )
+                        if (esModoPro) {
+                            Text(
+                                text = "Portal Ejecutivo PRO • ${nombreNegocioPro.ifBlank { "Cliente VIP" }}",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = Color.White,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+
+                    if (esModoPro) {
+                        Surface(
+                            color = Color(0xFFD4AF37),
+                            shape = RoundedCornerShape(20.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = null,
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "MODO PRO",
+                                    color = Color.Black,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.ExtraBold
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo),
+                        contentDescription = "Banner Master Martini",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .width(240.dp)
+                            .height(75.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                    )
+                }
+            }
+
+            item {
                 Button(
                     onClick = onIrARegistro,
-                    modifier = Modifier.fillMaxWidth().height(52.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    shape = RoundedCornerShape(26.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorBotonPrincipal,
+                        contentColor = if (esModoPro) Color.Black else Color.White
+                    )
                 ) {
-                    Text(text = "Inscribir mi Negocio Gastronómico")
+                    Text(
+                        text = if (esModoPro) {
+                            "Actualizar Datos de mi Negocio Pro"
+                        } else {
+                            "Inscribir mi Negocio Gastronómico"
+                        },
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
-            items(recetas) { receta ->
-                TarjetaReceta(receta)
-            }
-        }
-    }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HomeScreenMediana(recetas: List<Receta>, onIrARegistro: () -> Unit = {}) {
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text(text = "Master Martini - Vista Tablet/Mediana") })
-        }
-    ) { innerPadding ->
-        Row(
-            modifier = Modifier
-                .padding(paddingValues = innerPadding)
-                .fillMaxSize()
-                .padding(all = 20.dp),
-            horizontalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Portal Técnico Gastronómico",
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.titleLarge
+            items(listaCursos) { curso ->
+                ApartadoCursoButtonCard(
+                    receta = curso,
+                    esModoPro = esModoPro,
+                    onClick = { onSeleccionarCurso(curso.id) }
                 )
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "Logo Master Martini",
-                    modifier = Modifier.fillMaxWidth().height(160.dp),
-                    contentScale = ContentScale.Fit
-                )
-                Button(onClick = onIrARegistro, modifier = Modifier.fillMaxWidth()) {
-                    Text(text = "Inscribir Negocio")
-                }
-            }
-            LazyColumn(
-                modifier = Modifier.weight(1.5f),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(recetas) { receta ->
-                    TarjetaReceta(receta)
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HomeScreenExpandida(recetas: List<Receta>, onIrARegistro: () -> Unit = {}) {
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text(text = "Master Martini - Panel Expandido") })
-        }
-    ) { innerPadding ->
-        Row(
-            modifier = Modifier
-                .padding(paddingValues = innerPadding)
-                .fillMaxSize()
-                .padding(all = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
-            ) {
-                Text(
-                    text = "Master Martini Chile SPA",
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.headlineMedium
-                )
-                Text(
-                    text = "Capacitación continua en chocolatería, pastelería, heladería y panadería.",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "Logo Master Martini",
-                    modifier = Modifier.fillMaxWidth().height(180.dp),
-                    contentScale = ContentScale.Fit
-                )
-                Button(onClick = onIrARegistro, modifier = Modifier.fillMaxWidth().height(56.dp)) {
-                    Text(text = "Registrar Cliente / Prospecto")
-                }
-            }
-            LazyColumn(
-                modifier = Modifier.weight(2f),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(recetas) { receta ->
-                    TarjetaReceta(receta)
-                }
             }
         }
     }
 }
 
 @Composable
-fun TarjetaReceta(receta: Receta) {
-    Card(
+fun ApartadoCursoButtonCard(
+    receta: Receta,
+    esModoPro: Boolean,
+    onClick: () -> Unit
+) {
+    val colorTarjeta = if (esModoPro) Color(0xFF1A1E26) else Color(0xFFE3E7F1)
+    val colorCategoria = if (esModoPro) Color(0xFFD4AF37) else Color(0xFF3B5984)
+    val colorTextoPrincipal = if (esModoPro) Color.White else Color(0xFF1C1B1F)
+    val colorTextoSecundario = if (esModoPro) Color.White else Color(0xFF49454F)
+
+    ElevatedCard(
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.elevatedCardColors(containerColor = colorTarjeta),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = receta.categoria, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-            Text(text = receta.titulo, style = MaterialTheme.typography.titleMedium)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = receta.categoria,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = colorCategoria
+                )
+                if (esModoPro) {
+                    Text(
+                        text = "Certificación Pro Activa",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = receta.descripcion, style = MaterialTheme.typography.bodyMedium)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Duración: ${receta.duracion}", style = MaterialTheme.typography.labelMedium)
+
+            Text(
+                text = receta.titulo,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = colorTextoPrincipal
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = receta.descripcionCorta,
+                style = MaterialTheme.typography.bodyMedium,
+                color = colorTextoSecundario
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Duración: ${receta.duracion} • Test: 5 preguntas",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = colorTextoSecundario
+                )
+
+                Button(
+                    onClick = onClick,
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorCategoria,
+                        contentColor = if (esModoPro) Color.Black else Color.White
+                    ),
+                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PlayArrow,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Ver Tutorial y Test",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp)
+                    )
+                }
+            }
         }
     }
-}
-
-@Preview(name = "Compact", widthDp = 360, heightDp = 800, showBackground = true)
-@Composable
-fun PreviewCompact() {
-    HomeScreenCompacta(recetas = CatalogoRepository().obtenerRecetas())
-}
-
-@Preview(name = "Medium", widthDp = 650, heightDp = 800, showBackground = true)
-@Composable
-fun PreviewMedium() {
-    HomeScreenMediana(recetas = CatalogoRepository().obtenerRecetas())
-}
-
-@Preview(name = "Expanded", widthDp = 900, heightDp = 800, showBackground = true)
-@Composable
-fun PreviewExpanded() {
-    HomeScreenExpandida(recetas = CatalogoRepository().obtenerRecetas())
 }
